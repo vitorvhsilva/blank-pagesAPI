@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import spring.blankpages.api.dto.LivroAtualizarInputDTO;
-import spring.blankpages.api.dto.LivroCadastroInputDTO;
-import spring.blankpages.api.dto.LivroOutputDTO;
-import spring.blankpages.api.dto.LivroListarOutputDTO;
+import spring.blankpages.api.dto.*;
 import spring.blankpages.domain.service.LivroService;
 
 import java.util.List;
@@ -44,6 +41,11 @@ public class LivroController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable String id) {
         return livroService.deletar(id);
+    }
+
+    @GetMapping("/genero")
+    public List<LivroListarOutputDTO> listarPorGenero(@RequestBody GeneroDTO dto) {
+        return livroService.listarPorGenero(dto);
     }
 
 }

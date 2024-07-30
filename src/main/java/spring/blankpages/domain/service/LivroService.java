@@ -5,10 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import spring.blankpages.api.dto.LivroAtualizarInputDTO;
-import spring.blankpages.api.dto.LivroCadastroInputDTO;
-import spring.blankpages.api.dto.LivroOutputDTO;
-import spring.blankpages.api.dto.LivroListarOutputDTO;
+import spring.blankpages.api.dto.*;
+import spring.blankpages.domain.model.Genero;
 import spring.blankpages.domain.model.Livro;
 import spring.blankpages.domain.repository.LivroRepository;
 import spring.blankpages.domain.service.atualizar.AtualizacaoLivro;
@@ -73,5 +71,19 @@ public class LivroService {
         livroRepository.delete(livro);
 
         return ResponseEntity.noContent().build();
+    }
+
+    public List<LivroListarOutputDTO> listarPorGenero(GeneroDTO dto) {
+        List<Genero> generoList = dto.getGeneros()
+                .stream()
+                .map(Genero::valueOf)
+                .collect(Collectors.toList());
+
+        List<Livro> livros = livroRepository.findByGeneros(generoList);
+
+        if (livros.isEmpty()) throw new RuntimeException("Nenhum livro encontrado");
+
+        return livros.stream()
+                .map(l -> modelMapper.map(l, LivroListarOutputDTO.class)).collect(Collectors.toList());
     }
 }
