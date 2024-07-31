@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import spring.blankpages.api.dto.*;
+import spring.blankpages.domain.model.Autor;
 import spring.blankpages.domain.model.Genero;
 import spring.blankpages.domain.model.Livro;
+import spring.blankpages.domain.repository.AutorRepository;
 import spring.blankpages.domain.repository.LivroRepository;
 import spring.blankpages.domain.service.atualizar.AtualizacaoLivro;
 import spring.blankpages.domain.service.validacao.ValidacaoLivro;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class LivroService {
 
+    private final AutorRepository autorRepository;
     private LivroRepository livroRepository;
     private ModelMapper modelMapper;
     private List<ValidacaoLivro> validacoes;
@@ -57,14 +60,6 @@ public class LivroService {
 
     }
 
-    private Livro buscarLivro(String id) {
-        Optional<Livro> livro = livroRepository.findById(id);
-
-        if (livro.isEmpty()) throw new RuntimeException("Livro não encontrado");
-
-        return livro.get();
-    }
-
     public ResponseEntity<Void> deletar(String id) {
         Livro livro = buscarLivro(id);
 
@@ -81,9 +76,38 @@ public class LivroService {
 
         List<Livro> livros = livroRepository.findByGeneros(generoList);
 
+        return converterLista(livros);
+    }
+
+    public List<LivroListarOutputDTO> listarPorAutor(AutorDTO dto) {
+        List<Autor> autores = autorRepository.encontrarPorNome(dto.getAutores());
+
+        if (autores.isEmpty()) throw new RuntimeException("Autores não encontrado");
+
+        List<Livro> livros = livroRepository.findAllByAutores(autores);
+
+        return converterLista(livros);
+    }
+
+    public List<LivroListarOutputDTO> listarPorAno(AnoDTO dto) {
+        List<Livro> livros = livroRepository.findAllByAno(dto.getAno());
+
+        return converterLista(livros);
+    }
+
+    private Livro buscarLivro(String id) {
+        Optional<Livro> livro = livroRepository.findById(id);
+
+        if (livro.isEmpty()) throw new RuntimeException("Livro não encontrado");
+
+        return livro.get();
+    }
+
+    private List<LivroListarOutputDTO> converterLista(List<Livro> livros) {
         if (livros.isEmpty()) throw new RuntimeException("Nenhum livro encontrado");
 
         return livros.stream()
                 .map(l -> modelMapper.map(l, LivroListarOutputDTO.class)).collect(Collectors.toList());
     }
+
 }

@@ -48,4 +48,15 @@ public class LivroController {
         return livroService.listarPorGenero(dto);
     }
 
+    @GetMapping("/autor")
+    public List<LivroListarOutputDTO> listarPorAutor(@RequestBody AutorDTO dto) {
+        return livroService.listarPorAutor(dto);
+    }
+
+    @GetMapping("/ano")
+    public List<LivroListarOutputDTO> listarPorAno(@RequestBody AnoDTO dto) {
+        return livroService.listarPorAno(dto);
+    }
+
+
 }
